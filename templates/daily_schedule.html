@@ -1,0 +1,106 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Daily Schedule for {{ date }}</h2>
+    <a
+      href="{{ url_for('view_calendar', plan_id=plan_id) }}"
+      class="btn btn-outline-primary"
+      >Back to Calendar</a
+    >
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="schedule-container">
+        {% for activity in activities %}
+        <div class="schedule-item mb-3 p-3 border rounded">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+              <span
+                class="badge {% if activity.time == 'morning' %}bg-warning text-dark {% elif activity.time == 'afternoon' %}bg-info text-dark {% else %}bg-dark{% endif %}"
+              >
+                {{ activity.time }}
+              </span>
+              <span class="badge bg-secondary ms-2"
+                >{{ activity.activity_type }}</span
+              >
+              {% if activity.is_critical %}
+              <span class="badge bg-danger ms-2">Critical</span>
+              {% endif %}
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                class="activity-checkbox"
+                data-plan-id="{{ plan_id }}"
+                data-date="{{ date }}"
+                data-activity-id="{{ activity.id }}"
+                {%
+                if
+                activity.completed
+                %}checked{%
+                endif
+                %}
+              />
+              <label class="ms-2">Completed</label>
+            </div>
+          </div>
+          <h5>{{ activity.description }}</h5>
+          {% if activity.duration %}
+          <p><strong>Duration:</strong> {{ activity.duration }} minutes</p>
+          {% endif %} {% if activity.intensity %}
+          <p>
+            <strong>Intensity:</strong>
+            <span
+              class="badge {% if activity.intensity == 'low' %}bg-success {% elif activity.intensity == 'medium' %}bg-warning text-dark {% else %}bg-danger{% endif %}"
+            >
+              {{ activity.intensity }}
+            </span>
+          </p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkboxes = document.querySelectorAll(".activity-checkbox");
+
+    checkboxes.forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        const planId = this.dataset.planId;
+        const date = this.dataset.date;
+        const activityId = this.dataset.activityId;
+        const completed = this.checked;
+
+        fetch("{{ url_for('update_activity') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            plan_id: planId,
+            date: date,
+            activity_id: activityId,
+            completed: completed,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!data.success) {
+              alert("Failed to update activity status");
+              this.checked = !completed; // revert the checkbox
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            this.checked = !completed; // revert the checkbox
+          });
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2 class="my-4">Welcome, {{ current_user.name }}!</h2>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">Upload Medical Report</h5>
+          <p class="card-text">
+            Upload your latest medical reports for analysis
+          </p>
+          <a href="{{ url_for('upload') }}" class="btn btn-primary"
+            >Upload Report</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">View Recovery Plans</h5>
+          <p class="card-text">
+            Check your existing recovery plans and progress
+          </p>
+          <a href="#" class="btn btn-primary">View Plans</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100">
+        <div class="card-body text-center">
+          <h5 class="card-title">Account Settings</h5>
+          <p class="card-text">Update your profile and preferences</p>
+          <a href="#" class="btn btn-primary">Settings</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+      <h4>Recent Activities</h4>
+    </div>
+    <div class="card-body">
+      <p>Your recent activities will appear here.</p>
+      <!-- You can add actual recent activities here later -->
+    </div>
+  </div>
+</div>
+{% endblock %}

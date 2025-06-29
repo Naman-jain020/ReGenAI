@@ -1,0 +1,70 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2 class="my-4">Recovery Plan Calendar</h2>
+
+  <div class="card mb-4">
+    <div
+      class="card-header bg-primary text-white d-flex justify-content-between align-items-center"
+    >
+      <h4>
+        {{ plan.start_date.strftime('%Y-%m-%d') }} to {{
+        plan.end_date.strftime('%Y-%m-%d') }}
+      </h4>
+      <span class="badge bg-light text-dark"
+        >{{ (plan.end_date - plan.start_date).days + 1 }} days</span
+      >
+    </div>
+    <div class="card-body">
+      <div class="mb-3">
+        <h5>Deficiencies Addressed:</h5>
+        <ul>
+          {% for deficiency in plan.deficiencies %}
+          <li>{{ deficiency.name }} ({{ deficiency.severity }})</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <div class="calendar-container">
+        {% for date, activities in plan.daily_activities.items() %}
+        <div class="day-card mb-3">
+          <div class="card">
+            <div class="card-header">
+              <h5>{{ date.strftime('%A, %B %d, %Y') }}</h5>
+            </div>
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <a
+                  href="{{ url_for('daily_schedule', plan_id=plan.plan_id, date=date.strftime('%Y-%m-%d')) }}"
+                  class="btn btn-sm btn-outline-primary"
+                  >View Details</a
+                >
+                <span class="badge bg-info">
+                  {{ activities|length }} activities
+                </span>
+              </div>
+              <div class="activity-preview">
+                {% for activity in activities[:3] %}
+                <div class="activity-item mb-2">
+                  <span
+                    class="badge {% if activity.time == 'morning' %}bg-warning text-dark {% elif activity.time == 'afternoon' %}bg-info text-dark {% else %}bg-dark{% endif %}"
+                  >
+                    {{ activity.time }}
+                  </span>
+                  {{ activity.activity_type }}: {{
+                  activity.description|truncate(50) }}
+                </div>
+                {% endfor %} {% if activities|length > 3 %}
+                <div class="text-muted">
+                  +{{ activities|length - 3 }} more activities
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

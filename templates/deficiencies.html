@@ -1,0 +1,83 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2 class="my-4">Detected Deficiencies</h2>
+
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h4>Recovery Time Estimate</h4>
+    </div>
+    <div class="card-body">
+      <p>Minimum recovery time: <strong>{{ min_days }} days</strong></p>
+      <p>Maximum recovery time: <strong>{{ max_days }} days</strong></p>
+    </div>
+  </div>
+
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h4>Deficiencies Found</h4>
+    </div>
+    <div class="card-body">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>Deficiency</th>
+            <th>Current Value</th>
+            <th>Normal Range</th>
+            <th>Severity</th>
+            <th>Border Value</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for deficiency in deficiencies %}
+          <tr>
+            <td>{{ deficiency.name }}</td>
+            <td>{{ deficiency.current_value }}</td>
+            <td>{{ deficiency.normal_range }}</td>
+            <td>
+              <span
+                class="badge {% if deficiency.severity == 'low' %}bg-success {% elif deficiency.severity == 'medium' %}bg-warning {% else %}bg-danger{% endif %}"
+              >
+                {{ deficiency.severity }}
+              </span>
+            </td>
+            <td>
+              {% if deficiency.is_border_value %}Yes{% else %}No{% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header bg-primary text-white">
+      <h4>Generate Recovery Plan</h4>
+    </div>
+    <div class="card-body">
+      <form method="POST" action="{{ url_for('generate_calendar') }}">
+        <input type="hidden" name="report_id" value="{{ report_id }}" />
+        <div class="mb-3">
+          <label for="days" class="form-label"
+            >Select number of days for recovery (between {{ min_days }} and {{
+            max_days }})</label
+          >
+          <input
+            type="number"
+            class="form-control"
+            id="days"
+            name="days"
+            min="{{ min_days }}"
+            max="{{ max_days }}"
+            value="{{ min_days }}"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">
+          Generate Recovery Plan
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
